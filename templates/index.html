@@ -1,0 +1,527 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>LC Project | PDF Q&A Generator</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            color: #20243a;
+            min-height: 100vh;
+            padding: 35px 18px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: inline-block;
+            background: #e8eaff;
+            color: #4f46e5;
+            padding: 12px;
+            border-radius: 14px;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .card {
+            background: white;
+            padding: 28px;
+            border-radius: 16px;
+            box-shadow: 0 5px 25px rgba(20, 30, 70, 0.06);
+            margin-bottom: 22px;
+        }
+
+        .card h2 {
+            font-size: 19px;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .upload-area {
+            border: 2px dashed #c7c9f9;
+            border-radius: 14px;
+            padding: 35px 18px;
+            text-align: center;
+            background: #fafaff;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .upload-area strong {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .upload-area p {
+            color: #777;
+            font-size: 13px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            margin-top: 18px;
+            cursor: pointer;
+        }
+
+        .file-info {
+            display: none;
+            background: #f0fdf4;
+            color: #166534;
+            padding: 13px;
+            border-radius: 9px;
+            margin-top: 15px;
+            overflow-wrap: anywhere;
+            font-size: 14px;
+        }
+
+        button, .download-btn {
+            display: inline-block;
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 17px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .primary-btn {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background: #3730a3;
+        }
+
+        button:disabled {
+            background: #a5a5b5;
+            cursor: not-allowed;
+        }
+
+        .secondary-btn {
+            background: #eef0ff;
+            color: #4338ca;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .step {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 16px 10px;
+            text-align: center;
+        }
+
+        .step span {
+            display: block;
+            font-size: 23px;
+            margin-bottom: 9px;
+        }
+
+        .step strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .step p {
+            font-size: 12px;
+            color: #777;
+            line-height: 1.5;
+        }
+
+        .status-box {
+            display: none;
+            margin-top: 18px;
+            padding: 14px;
+            border-radius: 9px;
+            background: #f3f4f6;
+            color: #374151;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .status-box.error {
+            display: block;
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .status-box.success {
+            display: block;
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .status-box.info {
+            display: block;
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .result-card {
+            display: none;
+        }
+
+        .result-card p {
+            color: #6b7280;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        footer {
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+            padding: 10px;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 25px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+
+        <header>
+            <div class="logo">📄</div>
+            <h1>PDF Question & Answer Generator</h1>
+            <p>
+                Upload your PDF and let AI generate relevant questions
+                and answers directly from your document.
+            </p>
+        </header>
+
+        <section class="card">
+            <h2>Upload your document</h2>
+            <p class="description">
+                Select the PDF you want to analyze. Your document will
+                be processed using your LangChain question-answering pipeline.
+            </p>
+
+            <form id="uploadForm">
+                <div class="upload-area">
+                    <div class="upload-icon">☁️</div>
+                    <strong>Choose a PDF document</strong>
+                    <p>PDF files only</p>
+
+                    <input
+                        type="file"
+                        id="pdfFile"
+                        name="pdf_file"
+                        accept=".pdf,application/pdf"
+                        required
+                    >
+                </div>
+
+                <div class="file-info" id="fileInfo"></div>
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                    id="uploadButton"
+                >
+                    Upload PDF
+                </button>
+            </form>
+
+            <div id="uploadStatus" class="status-box"></div>
+        </section>
+
+        <section class="card">
+            <h2>How it works</h2>
+
+            <div class="steps">
+                <div class="step">
+                    <span>📤</span>
+                    <strong>1. Upload PDF</strong>
+                    <p>Select your document to begin.</p>
+                </div>
+
+                <div class="step">
+                    <span>🤖</span>
+                    <strong>2. Generate Q&A</strong>
+                    <p>AI generates questions and answers.</p>
+                </div>
+
+                <div class="step">
+                    <span>📊</span>
+                    <strong>3. Download PDF</strong>
+                    <p>Download your generated questions and answers.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card result-card" id="resultCard">
+            <h2>Generate your Q&A</h2>
+            <p>
+                Your PDF has been uploaded. Start the analysis to
+                generate a question-and-answer PDF report.
+            </p>
+
+            <button
+                type="button"
+                class="primary-btn"
+                id="analyzeButton"
+            >
+                Generate Questions & Answers
+            </button>
+
+            <div id="analysisStatus" class="status-box"></div>
+
+            <a
+                id="downloadButton"
+                class="download-btn secondary-btn"
+                href="#"
+                download
+                style="display: none;"
+            >
+                Download Q&A PDF
+            </a>
+        </section>
+
+        <footer>
+            LC_Project · Powered by FastAPI and LangChain
+        </footer>
+
+    </main>
+
+    <script>
+        const uploadForm = document.getElementById("uploadForm");
+        const pdfInput = document.getElementById("pdfFile");
+        const fileInfo = document.getElementById("fileInfo");
+        const uploadButton = document.getElementById("uploadButton");
+        const uploadStatus = document.getElementById("uploadStatus");
+
+        const resultCard = document.getElementById("resultCard");
+        const analyzeButton = document.getElementById("analyzeButton");
+        const analysisStatus = document.getElementById("analysisStatus");
+        const downloadButton = document.getElementById("downloadButton");
+
+        let uploadedFilename = "";
+
+        function showStatus(element, message, type) {
+            element.textContent = message;
+            element.className = "status-box " + type;
+        }
+
+        pdfInput.addEventListener("change", function () {
+            const file = pdfInput.files[0];
+
+            fileInfo.style.display = "block";
+            resultCard.style.display = "none";
+            uploadedFilename = "";
+
+            if (!file) {
+                fileInfo.textContent = "";
+                return;
+            }
+
+            if (
+                !file.name.toLowerCase().endsWith(".pdf") ||
+                (file.type && file.type !== "application/pdf")
+            ) {
+                fileInfo.textContent = "Please select a valid PDF file.";
+                pdfInput.value = "";
+                return;
+            }
+
+            fileInfo.textContent =
+                "Selected: " + file.name +
+                " (" + (file.size / 1024 / 1024).toFixed(2) + " MB)";
+
+            uploadStatus.className = "status-box";
+            analysisStatus.className = "status-box";
+            downloadButton.style.display = "none";
+        });
+
+        uploadForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const file = pdfInput.files[0];
+
+            if (!file) {
+                showStatus(uploadStatus, "Please select a PDF first.", "error");
+                return;
+            }
+
+            if (!file.name.toLowerCase().endsWith(".pdf")) {
+                showStatus(uploadStatus, "Only PDF files are supported.", "error");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("pdf_file", file);
+            formData.append("file_name", file.name);
+
+            uploadButton.disabled = true;
+            uploadButton.textContent = "Uploading...";
+            showStatus(uploadStatus, "Uploading your PDF...", "info");
+            resultCard.style.display = "none";
+
+            try {
+                const response = await fetch("/upload", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || "Upload failed.");
+                }
+
+                uploadedFilename = file.name;
+
+                showStatus(
+                    uploadStatus,
+                    "PDF uploaded successfully! Click the button below to generate your Q&A.",
+                    "success"
+                );
+
+                resultCard.style.display = "block";
+                analysisStatus.className = "status-box";
+                downloadButton.style.display = "none";
+
+                resultCard.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+
+            } catch (error) {
+                showStatus(
+                    uploadStatus,
+                    "Upload error: " + error.message,
+                    "error"
+                );
+            } finally {
+                uploadButton.disabled = false;
+                uploadButton.textContent = "Upload PDF";
+            }
+        });
+
+        analyzeButton.addEventListener("click", async function () {
+            if (!uploadedFilename) {
+                showStatus(
+                    analysisStatus,
+                    "Please upload a PDF before starting analysis.",
+                    "error"
+                );
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("pdf_filename", uploadedFilename);
+
+            analyzeButton.disabled = true;
+            analyzeButton.textContent = "Generating Q&A...";
+            downloadButton.style.display = "none";
+
+            showStatus(
+                analysisStatus,
+                "Processing your PDF. This may take a few minutes...",
+                "info"
+            );
+
+            try {
+                const response = await fetch("/analyze", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || "Analysis failed.");
+                }
+
+                if (!data.download_url) {
+                    throw new Error("The server did not return a PDF download URL.");
+                }
+
+                downloadButton.href = data.download_url;
+                downloadButton.download = "QA.pdf";
+                downloadButton.style.display = "block";
+
+                showStatus(
+                    analysisStatus,
+                    "Analysis completed successfully! Your Q&A PDF is ready to download.",
+                    "success"
+                );
+
+            } catch (error) {
+                showStatus(
+                    analysisStatus,
+                    "Analysis error: " + error.message,
+                    "error"
+                );
+            } finally {
+                analyzeButton.disabled = false;
+                analyzeButton.textContent = "Generate Questions & Answers";
+            }
+        });
+    </script>
+</body>
+</html>
+
