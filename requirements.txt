@@ -14,5 +14,5 @@ python-multipart
 PyPDF2
 faiss-cpu
 python-dotenv
--e .
+# -e .
 reportlab
