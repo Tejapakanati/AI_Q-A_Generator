@@ -1,0 +1,9 @@
+README.md
+setup.py
+generative_ai_project.egg-info/PKG-INFO
+generative_ai_project.egg-info/SOURCES.txt
+generative_ai_project.egg-info/dependency_links.txt
+generative_ai_project.egg-info/top_level.txt
+src/__init__.py
+src/main.py
+src/prompt.py
